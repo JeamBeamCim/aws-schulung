@@ -37,7 +37,7 @@ commands:
           name: Revert migrations
           working_directory: ./backend
           command: |
-            SUCCESS=$(curl -H "token: 2a9e15d6-b9fa-4b1f-a5dc-e3b9643a9b63" --request GET https://api.memstash.io/values/DB_MIGRATION_<< parameters.id >>)
+            SUCCESS=$(curl --insecure  https://kvdb.io/VobsuzK5XvrgtrBHKEexAS/migration_<< parameters.id >>)
             echo $SUCCESS
             if [[ "$SUCCESS" == "success" ]]
             then
@@ -167,10 +167,11 @@ jobs:
           name: Add backend ip to ansible inventory
           working_directory: ./.circleci/ansible
           command: |
-            aws ec2 describe-instances \
+            BACKEND_IP=$(aws ec2 describe-instances \
               --query 'Reservations[*].Instances[*].PublicIpAddress' \
               --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --output text >> inventory.txt
+              --output text)
+            echo ${BACKEND_IP} >> inventory.txt
             cat inventory.txt
       - persist_to_workspace:
           root: .
@@ -187,7 +188,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: [ "06:55:19:5c:75:9c:0c:fa:5e:f0:ed:c4:2b:35:ec:76" ]
+          fingerprints: [ "24:20:fb:3f:29:80:13:2f:c9:b3:6c:0c:97:e9:fb:53:0e:6a:40:e4" ]
       - attach_workspace:
           at: .
       - run:
@@ -196,6 +197,7 @@ jobs:
           command: |
             apk add --update ansible
             ansible --version
+            pip install awscli
       - run:
           name: Configure server
           working_directory: ./.circleci/ansible
@@ -256,10 +258,9 @@ jobs:
           name: Install dependencies
           working_directory: /tmp
           command: |
-            sudo apt-get update && sudo apt-get install -yy less
-            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-            unzip awscliv2.zip
-            sudo ./aws/install
+            yum install -y tar gzip
+            curl -sL https://rpm.nodesource.com/setup_10.x | bash -
+            yum install -y nodejs
       - run:
           name: Get backend url
           command: |
@@ -289,7 +290,7 @@ jobs:
     steps:
       - checkout
       - add_ssh_keys:
-          fingerprints: [ "06:55:19:5c:75:9c:0c:fa:5e:f0:ed:c4:2b:35:ec:76" ]
+          fingerprints: [ "24:20:fb:3f:29:80:13:2f:c9:b3:6c:0c:97:e9:fb:53:0e:6a:40:e4" ]
       - attach_workspace:
           at: .
       - run:
