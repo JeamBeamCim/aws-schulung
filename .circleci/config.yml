@@ -229,100 +229,100 @@ jobs:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
 
-    deploy-frontend:
-      executor: node
-      steps:
-        - checkout
-        - attach_workspace:
-            at: .
-        - run:
-            name: Install dependencies
-            working_directory: /tmp
-            command: |
-              sudo apt-get update && sudo apt-get install -yy less
-              curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-              unzip awscliv2.zip
-              sudo ./aws/install
-        - run:
-            name: Get backend url
-            command: |
-              export API_URL="http://${BACKEND_IP}:3030"
-              echo "${API_URL}"
-              npm run build
-        - run:
-            name: Deploy frontend objects
-            working_directory: ./frontend
-            command: |
-              aws s3 cp ./dist "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
-        - persist_to_workspace:
-            root: .
-            paths:
-              - frontend/dist
-        - destroy_environment:
-            id: ${CIRCLE_WORKFLOW_ID:0:7}
-            when: on_fail
-        - revert_migrations:
-            id: ${CIRCLE_WORKFLOW_ID:0:7}
-            when: on_fail
+  deploy-frontend:
+    executor: node
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install dependencies
+          working_directory: /tmp
+          command: |
+            sudo apt-get update && sudo apt-get install -yy less
+            curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
+            unzip awscliv2.zip
+            sudo ./aws/install
+      - run:
+          name: Get backend url
+          command: |
+            export API_URL="http://${BACKEND_IP}:3030"
+            echo "${API_URL}"
+            npm run build
+      - run:
+          name: Deploy frontend objects
+          working_directory: ./frontend
+          command: |
+            aws s3 cp ./dist "s3://udapeople-${CIRCLE_WORKFLOW_ID:0:7}" --recursive
+      - persist_to_workspace:
+          root: .
+          paths:
+            - frontend/dist
+      - destroy_environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          when: on_fail
+      - revert_migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          when: on_fail
 
-    deploy-backend:
-      executor: python
-      steps:
-        - checkout
-        - add_ssh_keys:
-            fingerprints: [ "06:55:19:5c:75:9c:0c:fa:5e:f0:ed:c4:2b:35:ec:76" ]
-        - attach_workspace:
-            at: .
-        - run:
-            name: Install dependencies
-            working_directory: /tmp
-            command: |
-              apk add --update ansible curl rsync openssh nodejs npm
-              ansible --version
-              pip install awscli
-              aws --version
-        - run:
-            name: Deploy backend
-            working_directory: ./.circleci/ansible
-            command: |
-              cat inventory
-              ansible-playbook -i inventory deploy-server.yaml -vv
-        - destroy_environment:
-            id: ${CIRCLE_WORKFLOW_ID:0:7}
-            when: on_fail
-        - revert_migrations:
-            id: ${CIRCLE_WORKFLOW_ID:0:7}
-            when: on_fail
+  deploy-backend:
+    executor: python
+    steps:
+      - checkout
+      - add_ssh_keys:
+          fingerprints: [ "06:55:19:5c:75:9c:0c:fa:5e:f0:ed:c4:2b:35:ec:76" ]
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install dependencies
+          working_directory: /tmp
+          command: |
+            apk add --update ansible curl rsync openssh nodejs npm
+            ansible --version
+            pip install awscli
+            aws --version
+      - run:
+          name: Deploy backend
+          working_directory: ./.circleci/ansible
+          command: |
+            cat inventory
+            ansible-playbook -i inventory deploy-server.yaml -vv
+      - destroy_environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          when: on_fail
+      - revert_migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          when: on_fail
 
-    smoke-test:
-      executor: python
-      steps:
-        - checkout
-        - attach_workspace:
-            at: .
-        - run:
-            name: Install dependencies
-            working_directory: /tmp
-            command: |
-              apk add --update curl nodejs npm
-              pip install awscli
-        - run:
-            name: Backend smoke test.
-            working_directory: ./backend
-            command: |
-              curl https://kvdb.io/VobsuzK5XvrgtrBHKEexAS/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
-        - run:
-            name: Frontend smoke test.
-            working_directory: ./backend
-            command: |
-              URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website.eu-central-1.amazonaws.com/index.html"
-              curl -s ${URL} | grep -q "Welcome"
-        - destroy_environment:
-            id: ${CIRCLE_WORKFLOW_ID:0:7}
-            when: on_fail
-        - revert_migrations:
-            id: ${CIRCLE_WORKFLOW_ID:0:7}
-            when: on_fail
+  smoke-test:
+    executor: python
+    steps:
+      - checkout
+      - attach_workspace:
+          at: .
+      - run:
+          name: Install dependencies
+          working_directory: /tmp
+          command: |
+            apk add --update curl nodejs npm
+            pip install awscli
+      - run:
+          name: Backend smoke test.
+          working_directory: ./backend
+          command: |
+            curl https://kvdb.io/VobsuzK5XvrgtrBHKEexAS/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
+      - run:
+          name: Frontend smoke test.
+          working_directory: ./backend
+          command: |
+            URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website.eu-central-1.amazonaws.com/index.html"
+            curl -s ${URL} | grep -q "Welcome"
+      - destroy_environment:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          when: on_fail
+      - revert_migrations:
+          id: ${CIRCLE_WORKFLOW_ID:0:7}
+          when: on_fail
 
 workflows:
   default:
