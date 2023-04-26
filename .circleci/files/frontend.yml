@@ -23,6 +23,8 @@ Resources:
     Properties:
       Bucket: !Ref 'WebsiteBucket'
       PolicyDocument:
+        Id: PublicReadPolicy
+        Version: 2012-10-17
         Statement:
         - Sid: PublicReadForGetBucketObjects
           Effect: Allow
