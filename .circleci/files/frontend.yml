@@ -13,7 +13,7 @@ Resources:
       BucketName: !Sub "udapeople-${ID}"
       OwnershipControls:
         Rules:
-          - ObjectOwnership: BucketOwnerEnforced
+          - ObjectOwnership: BucketOwnerPreferred
       WebsiteConfiguration:
         IndexDocument: index.html
         ErrorDocument: 404.html
