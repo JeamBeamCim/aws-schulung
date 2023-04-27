@@ -332,13 +332,12 @@ jobs:
       - create-dotenv-file
       - run:
           name: Deploy backend
-          working_directory: .circleci/ansible
           command: |
             pwd
             tar czf backend.tar.gz backend/
             export ANSIBLE_HOST_KEY_CHECKING=false
             cat inventory.txt
-            ansible-playbook -i inventory.txt deploy-backend.yml -vv
+            ansible-playbook -i .circleci/ansible/inventory.txt .circleci/ansible/deploy-backend.yml -vv
       - destroy_environment:
           id: ${CIRCLE_WORKFLOW_ID:0:7}
           when: on_fail
