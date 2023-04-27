@@ -217,6 +217,7 @@ jobs:
             apk add --update ansible
             ansible --version
             pip install awscli
+      - create-dotenv-file
       - run:
           name: Configure server
           working_directory: ./.circleci/ansible
@@ -239,6 +240,7 @@ jobs:
           keys: [ backend-build ]
       - attach_workspace:
           at: .
+      - create-dotenv-file
       - run:
           name: Install AWS CLI dependencies
           working_directory: /tmp
@@ -369,6 +371,7 @@ jobs:
             apk add --no-cache python3 py3-pip \
               && pip3 install --upgrade pip \
               && pip install awscli
+      - create-dotenv-file
       - run:
           name: Backend smoke test.
           working_directory: ./backend
