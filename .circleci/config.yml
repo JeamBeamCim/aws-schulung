@@ -331,10 +331,12 @@ jobs:
           at: .
       - run:
           name: Install dependencies
-          working_directory: /tmp
           command: |
-            apk add --update curl nodejs npm
-            pip install awscli
+            apk --no-cache add curl
+            apk add --update npm
+            apk add --no-cache python3 py3-pip \
+              && pip3 install --upgrade pip \
+              && pip install awscli
       - run:
           name: Backend smoke test.
           working_directory: ./backend
