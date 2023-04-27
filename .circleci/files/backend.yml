@@ -11,7 +11,7 @@ Resources:
     Type: AWS::EC2::SecurityGroup
     Properties:
       GroupName: !Sub UdaPeople-${ID}
-      GroupDescription: Allow ports 22, 3030 and ports 9090, 9093 and 9100 for Prometheus monitoring
+      GroupDescription: Allow ports 22, 3030
       SecurityGroupIngress:
         - IpProtocol: tcp
           FromPort: 22
