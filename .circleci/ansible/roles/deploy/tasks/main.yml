@@ -2,10 +2,11 @@
 - name: "show remote environment"
   shell: env
 
+
 - name: Copy compiled files
   unarchive:
     src: /root/project/backend.tar.gz
-    dest: /home/ubuntu/
+    dest: /root/
 
 - name: "delete anything that might already be running"
   become: true
@@ -14,9 +15,7 @@
 
 - name: "start server"
   become: true
-  command: pm2 start -f ./main.js
-  args:
-    chdir: /home/ubuntu/backend/dist
+  command: pm2 start npm --name backend -- start
 
 #- name: Build backend
 #  ignore_errors: yes
