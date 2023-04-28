@@ -385,7 +385,7 @@ jobs:
               --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
               --output text)
             echo "BACKEND_IP=${BACKEND_IP}"
-            export API_URL="http://${BACKEND_IP}:80/api/status"
+            export API_URL="http://${BACKEND_IP}:3030/api/status"
             echo "${API_URL}"
             wget  "${API_URL}"
             if curl -s -v "${API_URL}" | grep "ok"
