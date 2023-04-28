@@ -2,7 +2,7 @@
 - name: Install dependencies.
   become: true
   apt:
-    name: [ "nodejs", "npm" ]
+    name: ["nodejs", "npm"]
     state: latest
     update_cache: yes
 
@@ -14,10 +14,21 @@
     production: yes
     state: present
 
-- name: Copy compiled files
-  unarchive:
+- name: Creates directory
+  file:
+    path: /home/ubuntu/backend
+    state: directory
+
+- name: Copy backend dist files web server
+  copy:
     src: /root/project/backend.tar.gz
-    dest: /home/ubuntu/
+    dest: /home/ubuntu/backend/artifact.tar.gz
+
+- name: Uncompress Backend
+  shell: |
+    cd /home/ubuntu/backend
+    tar xvzf artifact.tar.gz -C .
+    ls -la
 
 - name: Build
   become: true
@@ -26,32 +37,7 @@
     npm install
     npm run build
 
-- name: "delete anything that might already be running"
-  become: true
-  command: pm2 delete all
-  ignore_errors: true
-
 - name: Start PM2
   shell: |
     cd /home/ubuntu/backend
     pm2 start npm --name backend -- start
-
-#- name: Build backend
-#  ignore_errors: yes
-#  shell: |
-#    cd /home/ubuntu/backend
-#    npm i
-#    npm run build
-
-#- name: Stop and delete already running server
-#  ignore_errors: yes
-#  shell: |
-#    pm2 stop backend
-#    pm2 delete backend
-#
-#- name: Start server
-#  become: true
-#  shell: |
-#    cd /home/ubuntu/backend
-#    pm2 start npm --name backend -- start
-#    pm2 ls
