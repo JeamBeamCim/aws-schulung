@@ -376,14 +376,19 @@ jobs:
           name: Backend smoke test.
           working_directory: ./backend
           command: |
-            export BACKEND_URL=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=Udacity-Project3" --output text)
-            echo http://${BACKEND_URL}:3030/api/status
-            if 
-            curl -s http://${BACKEND_URL}:3030/api/status | grep "ok"
+            BACKEND_IP=$(aws ec2 describe-instances \
+              --query 'Reservations[*].Instances[*].PublicIpAddress' \
+              --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+              --output text)
+            echo "BACKEND_IP=${BACKEND_IP}"
+            export API_URL="http://${BACKEND_IP}:3030/api/status"
+            echo "${API_URL}"
+            wget  "${API_URL}"
+            if curl -s -v "${API_URL}" | grep "ok"
             then
-              exit 0
+              return 0
             else
-              exit 1
+              return 1
             fi
       - run:
           name: Frontend smoke test.
