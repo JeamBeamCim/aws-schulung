@@ -30,6 +30,7 @@
     cd /home/ubuntu/backend
     npm install
     npm run build
+    sudo npm run migrations
 
 - name: Start PM2
   shell: |
