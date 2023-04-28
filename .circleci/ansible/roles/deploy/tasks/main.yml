@@ -1,28 +1,30 @@
 ---
-- name: "show remote environment"
-  shell: env
-
-- name: "copy backend binaries"
-  become: yes
-  synchronize:
-    src: /root/project/backend/dist
-    dest: /home/ubuntu/uda_app
-    recursive: true
-
-- name: "copy node_modules"
-  become: yes
-  synchronize:
-    src: /root/project/backend/node_modules
-    dest: /home/ubuntu/uda_app
-    recursive: true
-
-- name: "delete anything that might already be running"
+- name: Upgrade npm
   become: true
-  command: pm2 delete all
-  ignore_errors: true
+  shell: |
+    npm install -g npm@latest
 
-- name: "start server"
+- name: Copy compiled files
+  unarchive:
+    src: /root/project/backend.tar.gz
+    dest: /home/ubuntu/
+
+- name: Build backend
+  ignore_errors: yes
+  shell: |
+    cd /home/ubuntu/backend
+    npm i
+    npm run build
+
+- name: Stop and delete already running server
+  ignore_errors: yes
+  shell: |
+    pm2 stop backend
+    pm2 delete backend
+
+- name: Start server
   become: true
-  command: pm2 start -f ./main.js
-  args:
-    chdir: /home/ubuntu/uda_app/dist
+  shell: |
+    cd /home/ubuntu/backend
+    pm2 start npm --name backend -- start
+    pm2 ls
