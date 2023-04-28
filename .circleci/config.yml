@@ -376,19 +376,14 @@ jobs:
           name: Backend smoke test.
           working_directory: ./backend
           command: |
-            BACKEND_IP=$(aws ec2 describe-instances \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --output text)
-            echo "BACKEND_IP=${BACKEND_IP}"
-            export API_URL="http://${BACKEND_IP}:3030/api/status"
-            echo "${API_URL}"
-            wget  "${API_URL}"
-            if curl -s -v "${API_URL}" | grep "ok"
+            export BACKEND_URL=$(aws ec2 describe-instances --query 'Reservations[*].Instances[*].PublicIpAddress' --filters "Name=tag:project,Values=Udacity-Project3" --output text)
+            echo http://${BACKEND_URL}:3030/api/status
+            if 
+            curl -s http://${BACKEND_URL}:3030/api/status | grep "ok"
             then
-              return 0
+              exit 0
             else
-              return 1
+              exit 1
             fi
       - run:
           name: Frontend smoke test.
@@ -396,12 +391,12 @@ jobs:
           command: |
             URL="http://udapeople-${CIRCLE_WORKFLOW_ID:0:7}.s3-website.us-east-1.amazonaws.com/index.html"
             curl -s ${URL} | grep -q "Welcome"
-      - destroy_environment:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          when: on_fail
-      - revert_migrations:
-          id: ${CIRCLE_WORKFLOW_ID:0:7}
-          when: on_fail
+#      - destroy_environment:
+#          id: ${CIRCLE_WORKFLOW_ID:0:7}
+#          when: on_fail
+#      - revert_migrations:
+#          id: ${CIRCLE_WORKFLOW_ID:0:7}
+#          when: on_fail
 
   cloudfront-update:
     docker:
