@@ -382,9 +382,9 @@ jobs:
           command: |
  #           curl https://kvdb.io/VobsuzK5XvrgtrBHKEexAS/migration_${CIRCLE_WORKFLOW_ID:0:7}  -d '1'
              BACKEND_IP=$(aws ec2 describe-instances \
-              --query 'Reservations[*].Instances[*].PublicIpAddress' \
-              --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
-              --output text)
+                     --query 'Reservations[*].Instances[*].PublicIpAddress' \
+                     --filters "Name=tag:project,Values=udapeople-backend-${CIRCLE_WORKFLOW_ID:0:7}" \
+                     --output text)
              echo "BACKEND_IP=${BACKEND_IP}"
              export API_URL="http://${BACKEND_IP}:80/api/status"
              echo "${API_URL}"
