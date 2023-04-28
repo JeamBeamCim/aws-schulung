@@ -19,16 +19,10 @@
     path: /home/ubuntu/backend
     state: directory
 
-- name: Copy backend dist files web server
-  copy:
+- name: Copy compiled files
+  unarchive:
     src: /root/project/backend.tar.gz
-    dest: /home/ubuntu/backend/artifact.tar.gz
-
-- name: Uncompress Backend
-  shell: |
-    cd /home/ubuntu/backend
-    tar xvzf artifact.tar.gz -C .
-    ls -la
+    dest: /home/ubuntu/
 
 - name: Build
   become: true
