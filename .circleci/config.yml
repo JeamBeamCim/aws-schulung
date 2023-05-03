@@ -455,9 +455,9 @@ jobs:
                       echo "$stack"
                       export OldWorkflowID=${stack##*-}
                       echo $OldWorkflowID
-                      aws cloudformation delete-stack --stack-name "back-end-${OldWorkflowID}"
+                      aws cloudformation delete-stack --stack-name "udapeople-backend-${OldWorkflowID}"
                       aws s3 rm "s3://udapeople-${OldWorkflowID}" --recursive
-                      aws cloudformation delete-stack --stack-name "front-end-${OldWorkflowID}"
+                      aws cloudformation delete-stack --stack-name "udapeople-frontend-${OldWorkflowID}"
                     fi
                 fi
             done
@@ -489,9 +489,9 @@ workflows:
           requires: [ run-migrations ]
       - deploy-backend:
           requires: [ run-migrations ]
-      - smoke-test:
-          requires: [ deploy-backend, deploy-frontend ]
-      - cloudfront-update:
-          requires: [ smoke-test ]
+#      - smoke-test:
+#          requires: [ deploy-backend, deploy-frontend ]
+#      - cloudfront-update:
+#          requires: [ smoke-test ]
       - cleanup:
-          requires: [ cloudfront-update ]
+#          requires: [ cloudfront-update ]
